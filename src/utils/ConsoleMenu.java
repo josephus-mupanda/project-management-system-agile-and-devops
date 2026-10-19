@@ -244,7 +244,8 @@ public class ConsoleMenu {
 
             System.out.println("\nOptions:");
             System.out.println("1. Update Project");
-            System.out.println("2. Back to Catalog");
+            System.out.println("2. Delete Project");
+            System.out.println("3. Back to Catalog");
             System.out.println();
 
             choice = ValidationUtils.readInt(scanner, "Enter your choice: ");
@@ -254,11 +255,36 @@ public class ConsoleMenu {
                     updateProject(project);
                     break;
                 case 2:
+                    if (deleteProject(project)) {
+                        return;
+                    }
+                    break;
+                case 3:
                     break;
                 default:
-                    System.out.println("Error: Invalid option. Please select 1-2.");
+                    System.out.println("Error: Invalid option. Please select 1-3.");
             }
-        } while (choice != 2);
+        } while (choice != 3);
+    }
+
+    // Returns true when the project was deleted, so the details screen can close.
+    private boolean deleteProject(Project project) {
+
+        if (!requireModifyAccess("delete projects")) {
+            return false;
+        }
+
+        boolean confirmed = ValidationUtils.readYesNo(
+                scanner, "Delete project \"" + project.getName() + "\"? (y/n): ");
+
+        if (!confirmed) {
+            System.out.println("Nothing was deleted.");
+            return false;
+        }
+
+        projectService.deleteProject(project.getId());
+        System.out.println("\nProject \"" + project.getName() + "\" deleted.");
+        return true;
     }
 
     private void updateProject(Project project) {

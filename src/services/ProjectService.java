@@ -51,6 +51,20 @@ public class ProjectService {
         return true;
     }
 
+    // Shifts the later projects one step left so the array stays packed.
+    public boolean deleteProject(int projectId) {
+        for (int i = 0; i < count; i++) {
+            if (projects[i].getId() == projectId) {
+                for (int j = i; j < count - 1; j++) {
+                    projects[j] = projects[j + 1];
+                }
+                projects[--count] = null;
+                return true;
+            }
+        }
+        return false;
+    }
+
     public Project findProject(int projectId) {
         for (int i = 0; i < count; i++) {
             if (projects[i].getId() == projectId) {

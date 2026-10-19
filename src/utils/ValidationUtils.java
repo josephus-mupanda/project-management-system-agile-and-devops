@@ -167,6 +167,26 @@ public class ValidationUtils {
         }
     }
 
+    public static boolean readYesNo(Scanner scanner, String message) {
+
+        String prompt = message;
+
+        while (true) {
+
+            System.out.print(prompt);
+            String answer = scanner.nextLine().trim().toLowerCase();
+
+            if (answer.equals("y") || answer.equals("yes")) {
+                return true;
+            }
+            if (answer.equals("n") || answer.equals("no")) {
+                return false;
+            }
+            System.out.println("Error: Please answer y or n.\n");
+            prompt = RETRY;
+        }
+    }
+
     public static String readEmail(Scanner scanner, String message) {
 
         String prompt = message;
