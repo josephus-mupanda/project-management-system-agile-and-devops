@@ -59,7 +59,16 @@ classDiagram
     Project <|-- HardwareProject
     User <|-- RegularUser
     User <|-- AdminUser
+    class UserService {
+        -User[] users
+        +addUser(User) boolean
+        +createUser(String, String, boolean) User
+        +findUser(int) User
+        +emailExists(String) boolean
+    }
+
     ProjectService o-- Project
+    UserService o-- User
 ```
 
 ## Scope reduction
@@ -113,7 +122,7 @@ Each class keeps a `static` counter that goes up every time an object is created
 - **ConsoleMenu** decides what is printed next and which screen follows.
 - **ValidationUtils** is the only class that reads raw input, so every prompt keeps asking until the value is valid.
 
-Users are still kept by `ConsoleMenu` itself. That is the one place where the menu holds data, and it is a candidate to move into its own service.
+Users used to be stored inside `ConsoleMenu`, which made them impossible to unit test. In Sprint 2 (retrospective action A2) they moved to `UserService`. The menu now only keeps who is logged in (`currentUser`), which is session state, not data.
 
 ## Role rules
 
@@ -124,5 +133,4 @@ Regular users can view and add projects. Only admins can create users. The check
 | Limit now | Planned direction |
 |---|---|
 | Nothing is saved when the program closes | Save to files (US-07) |
-| Users are stored in the menu class | Move them to a `UserService` |
 | Switching user needs no password | Add authentication |

@@ -2,8 +2,8 @@ import models.AdminUser;
 import models.HardwareProject;
 import models.RegularUser;
 import models.SoftwareProject;
-import models.User;
 import services.ProjectService;
+import services.UserService;
 import utils.ConsoleMenu;
 
 import java.util.Scanner;
@@ -13,9 +13,10 @@ public class Main {
     public static void main(String[] args) {
 
         ProjectService projectService = new ProjectService();
+        UserService userService = new UserService();
 
-        User admin = new AdminUser("Admin", "admin@gmail.com");
-        User josephus = new RegularUser("Josephus Mupanda", "josephus@gmail.com");
+        userService.addUser(new AdminUser("Admin", "admin@gmail.com"));
+        userService.addUser(new RegularUser("Josephus Mupanda", "josephus@gmail.com"));
 
         projectService.addProject(new SoftwareProject(
                 "Budget Buddy", "Personal expense and savings tracker", 8000, 3, 12, "Java"));
@@ -33,11 +34,7 @@ public class Main {
 
         Scanner scanner = new Scanner(System.in);
 
-        ConsoleMenu menu = new ConsoleMenu(
-                scanner,
-                projectService,
-                new User[]{admin, josephus}
-        );
+        ConsoleMenu menu = new ConsoleMenu(scanner, projectService, userService);
 
         menu.start();
 

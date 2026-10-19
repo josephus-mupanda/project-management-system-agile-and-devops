@@ -1,14 +1,12 @@
 package utils;
 
-import models.AdminUser;
 import models.HardwareProject;
 import models.Project;
-import models.RegularUser;
 import models.SoftwareProject;
 import models.User;
 import services.ProjectService;
+import services.UserService;
 
-import java.util.Arrays;
 import java.util.Scanner;
 
 public class ConsoleMenu {
@@ -19,16 +17,14 @@ public class ConsoleMenu {
 
     private final Scanner scanner;
     private final ProjectService projectService;
-    private User[] users;
-    private int userCount;
+    private final UserService userService;
     private User currentUser;
 
-    public ConsoleMenu(Scanner scanner, ProjectService projectService, User[] initialUsers) {
+    public ConsoleMenu(Scanner scanner, ProjectService projectService, UserService userService) {
         this.scanner = scanner;
         this.projectService = projectService;
-        this.users = Arrays.copyOf(initialUsers, Math.max(10, initialUsers.length * 2));
-        this.userCount = initialUsers.length;
-        this.currentUser = initialUsers[0];
+        this.userService = userService;
+        this.currentUser = userService.getUsers()[0];
     }
 
     public static void printHeader(String title) {
@@ -342,7 +338,7 @@ public class ConsoleMenu {
             System.out.println("Current User: " + currentUser.getName()
                     + " (" + currentUser.getRole() + ")");
             System.out.println();
-            displayUsers();
+            userService.displayUsers();
             System.out.println("1. Switch to another user");
             System.out.println("2. Create a new user");
             System.out.println("3. Back to Main Menu");
@@ -368,7 +364,7 @@ public class ConsoleMenu {
     private void switchUser() {
 
         int id = ValidationUtils.readId(scanner, "Enter user ID: ", "U");
-        User user = findUser(id);
+        User user = userService.findUser(id);
 
         if (user == null) {
             System.out.println("Error: User not found.");
@@ -388,7 +384,7 @@ public class ConsoleMenu {
         String name = ValidationUtils.readText(scanner, "Enter name: ", "Name");
         String email = ValidationUtils.readEmail(scanner, "Enter email: ");
 
-        while (emailExists(email)) {
+        while (userService.emailExists(email)) {
             System.out.println("Error: A user with this email already exists.\n");
             email = ValidationUtils.readEmail(scanner, "Enter again: ");
         }
@@ -402,51 +398,8 @@ public class ConsoleMenu {
             role = ValidationUtils.readInt(scanner, "Enter again: ");
         }
 
-        User user = addUser(name, email, role == 2);
+        User user = userService.createUser(name, email, role == 2);
         System.out.println("\nUser " + user.getName() + " created successfully (ID: "
                 + user.getDisplayId() + ").");
-    }
-
-    private User findUser(int userId) {
-        for (int i = 0; i < userCount; i++) {
-            if (users[i].getId() == userId) {
-                return users[i];
-            }
-        }
-        return null;
-    }
-
-    private boolean emailExists(String email) {
-        for (int i = 0; i < userCount; i++) {
-            if (users[i].getEmail().equalsIgnoreCase(email.trim())) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private User addUser(String name, String email, boolean admin) {
-        if (userCount == users.length) {
-            users = Arrays.copyOf(users, users.length * 2);
-        }
-
-        User user = admin ? new AdminUser(name, email) : new RegularUser(name, email);
-        users[userCount++] = user;
-        return user;
-    }
-
-    private void displayUsers() {
-        System.out.println(LINE);
-        System.out.printf("%-4s | %-20s | %-8s | %s%n", "ID", "NAME", "ROLE", "EMAIL");
-        System.out.println(LINE);
-
-        for (int i = 0; i < userCount; i++) {
-            User user = users[i];
-            System.out.printf(
-                    "%-4s | %-20s | %-8s | %s%n",
-                    user.getDisplayId(), user.getName(), user.getRole(), user.getEmail()
-            );
-        }
-        System.out.println(LINE);
     }
 }
