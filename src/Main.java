@@ -4,6 +4,7 @@ import models.RegularUser;
 import models.SoftwareProject;
 import services.ProjectService;
 import services.UserService;
+import utils.AppLogger;
 import utils.ConsoleMenu;
 
 import java.util.Scanner;
@@ -36,8 +37,12 @@ public class Main {
 
         ConsoleMenu menu = new ConsoleMenu(scanner, projectService, userService);
 
+        AppLogger.get().info("Application started with " + projectService.getProjects().length
+                + " projects and " + userService.getUsers().length + " users");
+
         menu.start();
 
+        AppLogger.get().info("Application stopped");
         scanner.close();
     }
 }

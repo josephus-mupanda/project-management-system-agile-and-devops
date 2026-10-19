@@ -7,11 +7,16 @@ import models.User;
 import services.ProjectService;
 import services.UserService;
 
+import java.util.NoSuchElementException;
 import java.util.Scanner;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class ConsoleMenu {
 
     public static final String LINE = "─".repeat(80);
+
+    private static final Logger LOG = AppLogger.get();
 
     private static final int BOX_WIDTH = 44;
 
@@ -40,26 +45,41 @@ public class ConsoleMenu {
 
     public void start() {
 
-        int choice;
+        int choice = 0;
 
         do {
-            displayMainMenu();
-            choice = ValidationUtils.readInt(scanner, "Enter your choice: ");
-
-            switch (choice) {
-                case 1:
-                    projectMenu();
-                    break;
-                case 2:
-                    userMenu();
-                    break;
-                case 3:
-                    System.out.println("\nGoodbye.");
-                    break;
-                default:
-                    System.out.println("Error: Invalid option. Please select 1-3.");
+            // Error tracking: an unexpected error is logged and the user goes back to the
+            // main menu instead of the program crashing.
+            try {
+                displayMainMenu();
+                choice = ValidationUtils.readInt(scanner, "Enter your choice: ");
+                handleMainChoice(choice);
+            } catch (NoSuchElementException e) {
+                // The input was closed (for example at the end of a piped file).
+                LOG.warning("Input closed, stopping the menu.");
+                return;
+            } catch (RuntimeException e) {
+                LOG.log(Level.SEVERE, "Unexpected error in the menu", e);
+                System.out.println("\nError: Something went wrong. It was logged; please try again.");
+                choice = 0;
             }
         } while (choice != 3);
+    }
+
+    private void handleMainChoice(int choice) {
+        switch (choice) {
+            case 1:
+                projectMenu();
+                break;
+            case 2:
+                userMenu();
+                break;
+            case 3:
+                System.out.println("\nGoodbye.");
+                break;
+            default:
+                System.out.println("Error: Invalid option. Please select 1-3.");
+        }
     }
 
     private void displayMainMenu() {
@@ -80,6 +100,7 @@ public class ConsoleMenu {
             return true;
         }
         System.out.println("Error: Access denied. Only admins can " + action + ".");
+        LOG.warning("Access denied: " + currentUser.getName() + " tried to " + action);
         return false;
     }
 
@@ -234,6 +255,8 @@ public class ConsoleMenu {
         }
 
         projectService.addProject(project);
+        LOG.info("Project created: " + project.getDisplayId() + " \"" + project.getName()
+                + "\" by " + currentUser.getName());
         System.out.println("\nProject successfully created (ID: " + project.getDisplayId() + ").");
     }
 
@@ -285,6 +308,8 @@ public class ConsoleMenu {
         }
 
         projectService.deleteProject(project.getId());
+        LOG.info("Project deleted: " + project.getDisplayId() + " \"" + project.getName()
+                + "\" by " + currentUser.getName());
         System.out.println("\nProject \"" + project.getName() + "\" deleted.");
         return true;
     }
@@ -317,6 +342,8 @@ public class ConsoleMenu {
                 project.getDurationWeeks());
 
         projectService.updateProject(project.getId(), name, description, budget, teamSize, duration);
+        LOG.info("Project updated: " + project.getDisplayId() + " \"" + project.getName()
+                + "\" by " + currentUser.getName());
         System.out.println("\nProject " + project.getDisplayId() + " updated successfully.");
     }
 
@@ -400,6 +427,8 @@ public class ConsoleMenu {
         }
 
         userService.deleteUser(id, currentUser);
+        LOG.info("User deleted: " + user.getDisplayId() + " \"" + user.getName()
+                + "\" by " + currentUser.getName());
         System.out.println("\nUser \"" + user.getName() + "\" deleted.");
     }
 
@@ -414,6 +443,7 @@ public class ConsoleMenu {
         }
 
         currentUser = user;
+        LOG.info("Switched user to " + user.getDisplayId() + " \"" + user.getName() + "\"");
         System.out.println("\nNow logged in as " + user.getName() + " (" + user.getRole() + ").");
     }
 
@@ -441,6 +471,8 @@ public class ConsoleMenu {
         }
 
         User user = userService.createUser(name, email, role == 2);
+        LOG.info("User created: " + user.getDisplayId() + " \"" + user.getName() + "\" ("
+                + user.getRole() + ") by " + currentUser.getName());
         System.out.println("\nUser " + user.getName() + " created successfully (ID: "
                 + user.getDisplayId() + ").");
     }

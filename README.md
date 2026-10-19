@@ -40,6 +40,22 @@ Every push to GitHub runs the [CI workflow](.github/workflows/ci.yml):
 3. Smoke test: start the app and choose "Exit", to prove it starts.
 4. Upload the test reports as a build artifact.
 
+## Logging and error tracking
+
+The app writes what happens to `logs/app.log` (created automatically, not committed to git). The console stays clean for the menus.
+
+```
+2026-10-19 07:02:09 INFO    Application started with 5 projects and 2 users
+2026-10-19 07:02:10 INFO    Project created: PRJ006 "Robot Arm" by Admin
+2026-10-19 07:02:19 WARNING Access denied: Josephus Mupanda tried to delete projects
+```
+
+| Level | When |
+|---|---|
+| `INFO` | Start and stop, every create, update and delete of a project or user, user switch |
+| `WARNING` | A regular user tries an admin action |
+| `SEVERE` | An unexpected error. The full stack trace is logged, the user sees a short message and goes back to the main menu instead of the program crashing |
+
 ## How the program is organised
 
 ```mermaid
