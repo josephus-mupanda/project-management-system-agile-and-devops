@@ -4,6 +4,7 @@ import models.HardwareProject;
 import models.Project;
 import models.SoftwareProject;
 import models.User;
+import services.HealthService;
 import services.ProjectService;
 import services.UserService;
 
@@ -23,12 +24,15 @@ public class ConsoleMenu {
     private final Scanner scanner;
     private final ProjectService projectService;
     private final UserService userService;
+    private final HealthService healthService;
     private User currentUser;
 
-    public ConsoleMenu(Scanner scanner, ProjectService projectService, UserService userService) {
+    public ConsoleMenu(Scanner scanner, ProjectService projectService, UserService userService,
+                       HealthService healthService) {
         this.scanner = scanner;
         this.projectService = projectService;
         this.userService = userService;
+        this.healthService = healthService;
         this.currentUser = userService.getUsers()[0];
     }
 
@@ -60,10 +64,11 @@ public class ConsoleMenu {
                 return;
             } catch (RuntimeException e) {
                 LOG.log(Level.SEVERE, "Unexpected error in the menu", e);
+                healthService.recordError();
                 System.out.println("\nError: Something went wrong. It was logged; please try again.");
                 choice = 0;
             }
-        } while (choice != 3);
+        } while (choice != 4);
     }
 
     private void handleMainChoice(int choice) {
@@ -75,10 +80,14 @@ public class ConsoleMenu {
                 userMenu();
                 break;
             case 3:
+                healthService.displayHealth();
+                LOG.info("Health check viewed: status " + healthService.getStatus());
+                break;
+            case 4:
                 System.out.println("\nGoodbye.");
                 break;
             default:
-                System.out.println("Error: Invalid option. Please select 1-3.");
+                System.out.println("Error: Invalid option. Please select 1-4.");
         }
     }
 
@@ -91,7 +100,8 @@ public class ConsoleMenu {
         System.out.println("-----------");
         System.out.println("1. Manage Projects");
         System.out.println("2. Manage Users");
-        System.out.println("3. Exit");
+        System.out.println("3. System Health");
+        System.out.println("4. Exit");
         System.out.println();
     }
 

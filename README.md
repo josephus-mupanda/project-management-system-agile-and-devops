@@ -56,14 +56,30 @@ The app writes what happens to `logs/app.log` (created automatically, not commit
 | `WARNING` | A regular user tries an admin action |
 | `SEVERE` | An unexpected error. The full stack trace is logged, the user sees a short message and goes back to the main menu instead of the program crashing |
 
+## Health check
+
+Main menu option `3. System Health` is the console version of a health endpoint:
+
+```
+Status:             UP
+Uptime:             0h 04m 12s
+Projects:           5
+Users:              2
+Errors since start: 0
+Log file:           logs/app.log
+```
+
+The status is `UP` while no unexpected error happened and `DEGRADED` after the first one. The number of errors comes from the error tracking in the main menu.
+
 ## How the program is organised
 
 ```mermaid
 flowchart TD
     A["Main - creates the objects and loads sample data"] --> B["ConsoleMenu - screens and navigation"]
     B --> C["ValidationUtils - reads and checks every input"]
-    B --> D["ProjectService - find, filter, add projects"]
+    B --> D["Services - ProjectService, UserService, HealthService"]
     D --> E["Models - Project, User"]
+    B --> L["AppLogger - writes logs/app.log"]
 ```
 
 ## Using the application
@@ -72,7 +88,8 @@ flowchart TD
 flowchart TD
     M(["Main Menu"]) --> P["1. Manage Projects"]
     M --> U["2. Manage Users"]
-    M --> X(["3. Exit"])
+    M --> H["3. System Health"]
+    M --> X(["4. Exit"])
 
     P --> P1["Browse Project Catalog"]
     P --> P2["Add New Project"]
@@ -109,11 +126,17 @@ src/
     AdminUser.java
   services/
     ProjectService.java
+    UserService.java
+    HealthService.java       status, uptime and error count
   utils/
+    AppLogger.java           file logging
     ConsoleMenu.java
     ValidationUtils.java
+test/                        JUnit 5 unit and integration tests
+.github/workflows/ci.yml     CI pipeline
 docs/
   agile/                     sprint planning, reviews and retrospectives
+  evidence/                  CI and test screenshots
   design-decisions.md
 ```
 

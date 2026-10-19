@@ -2,6 +2,7 @@ import models.AdminUser;
 import models.HardwareProject;
 import models.RegularUser;
 import models.SoftwareProject;
+import services.HealthService;
 import services.ProjectService;
 import services.UserService;
 import utils.AppLogger;
@@ -35,7 +36,9 @@ public class Main {
 
         Scanner scanner = new Scanner(System.in);
 
-        ConsoleMenu menu = new ConsoleMenu(scanner, projectService, userService);
+        HealthService healthService = new HealthService(projectService, userService);
+
+        ConsoleMenu menu = new ConsoleMenu(scanner, projectService, userService, healthService);
 
         AppLogger.get().info("Application started with " + projectService.getProjects().length
                 + " projects and " + userService.getUsers().length + " users");
