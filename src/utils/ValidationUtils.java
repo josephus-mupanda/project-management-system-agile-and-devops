@@ -105,6 +105,68 @@ public class ValidationUtils {
         }
     }
 
+    // The "OrKeep" methods return the current value when the user just presses Enter.
+
+    public static String readTextOrKeep(Scanner scanner, String message, String current) {
+
+        System.out.print(message);
+        String text = scanner.nextLine().trim();
+
+        return text.isEmpty() ? current : text;
+    }
+
+    public static int readPositiveIntOrKeep(Scanner scanner, String message, String fieldName,
+                                            int current) {
+
+        String prompt = message;
+
+        while (true) {
+
+            System.out.print(prompt);
+            String input = scanner.nextLine().trim();
+
+            if (input.isEmpty()) {
+                return current;
+            }
+            try {
+                int value = Integer.parseInt(input);
+                if (value > 0) {
+                    return value;
+                }
+                System.out.println("Error: " + fieldName + " must be greater than 0.\n");
+            } catch (NumberFormatException e) {
+                System.out.println("Error: Invalid input. Please enter a number.\n");
+            }
+            prompt = RETRY;
+        }
+    }
+
+    public static double readPositiveDoubleOrKeep(Scanner scanner, String message, String fieldName,
+                                                  double current) {
+
+        String prompt = message;
+
+        while (true) {
+
+            System.out.print(prompt);
+            String input = scanner.nextLine().trim();
+
+            if (input.isEmpty()) {
+                return current;
+            }
+            try {
+                double value = Double.parseDouble(input);
+                if (value > 0) {
+                    return value;
+                }
+                System.out.println("Error: " + fieldName + " must be greater than 0.\n");
+            } catch (NumberFormatException e) {
+                System.out.println("Error: Invalid input. Please enter a valid number.\n");
+            }
+            prompt = RETRY;
+        }
+    }
+
     public static String readEmail(Scanner scanner, String message) {
 
         String prompt = message;

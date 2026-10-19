@@ -12,6 +12,27 @@ public abstract class Project {
     private int durationWeeks;
 
     public Project(String name, String description, double budget, int teamSize, int durationWeeks) {
+        validate(name, budget, teamSize, durationWeeks);
+        this.id = nextId++;
+        this.name = name;
+        this.description = description;
+        this.budget = budget;
+        this.teamSize = teamSize;
+        this.durationWeeks = durationWeeks;
+    }
+
+    // Every value is checked first, so a bad value never leaves the project half updated.
+    public void updateDetails(String name, String description, double budget, int teamSize,
+                              int durationWeeks) {
+        validate(name, budget, teamSize, durationWeeks);
+        this.name = name;
+        this.description = description;
+        this.budget = budget;
+        this.teamSize = teamSize;
+        this.durationWeeks = durationWeeks;
+    }
+
+    private static void validate(String name, double budget, int teamSize, int durationWeeks) {
         if (name == null || name.trim().isEmpty()) {
             throw new IllegalArgumentException("Project name cannot be empty.");
         }
@@ -24,12 +45,6 @@ public abstract class Project {
         if (durationWeeks <= 0) {
             throw new IllegalArgumentException("Duration must be greater than 0.");
         }
-        this.id = nextId++;
-        this.name = name;
-        this.description = description;
-        this.budget = budget;
-        this.teamSize = teamSize;
-        this.durationWeeks = durationWeeks;
     }
 
     public abstract String getType();

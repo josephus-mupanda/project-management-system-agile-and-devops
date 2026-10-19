@@ -191,7 +191,7 @@ public class ConsoleMenu {
             return;
         }
 
-        showProject(project);
+        projectDetails(project);
     }
 
     private void addProject() {
@@ -233,6 +233,63 @@ public class ConsoleMenu {
 
         projectService.addProject(project);
         System.out.println("\nProject successfully created (ID: " + project.getDisplayId() + ").");
+    }
+
+    private void projectDetails(Project project) {
+
+        int choice;
+
+        do {
+            showProject(project);
+
+            System.out.println("\nOptions:");
+            System.out.println("1. Update Project");
+            System.out.println("2. Back to Catalog");
+            System.out.println();
+
+            choice = ValidationUtils.readInt(scanner, "Enter your choice: ");
+
+            switch (choice) {
+                case 1:
+                    updateProject(project);
+                    break;
+                case 2:
+                    break;
+                default:
+                    System.out.println("Error: Invalid option. Please select 1-2.");
+            }
+        } while (choice != 2);
+    }
+
+    private void updateProject(Project project) {
+
+        if (!requireModifyAccess("update projects")) {
+            return;
+        }
+
+        printHeader("UPDATE PROJECT: " + project.getDisplayId());
+        System.out.println("Press Enter to keep the current value shown in brackets.\n");
+
+        String name = ValidationUtils.readTextOrKeep(
+                scanner, "Name [" + project.getName() + "]: ", project.getName());
+
+        while (projectService.nameTakenByOther(name, project.getId())) {
+            System.out.println("Error: A project with this name already exists.\n");
+            name = ValidationUtils.readTextOrKeep(scanner, "Enter again: ", project.getName());
+        }
+
+        String description = ValidationUtils.readTextOrKeep(
+                scanner, "Description [" + project.getDescription() + "]: ", project.getDescription());
+        double budget = ValidationUtils.readPositiveDoubleOrKeep(
+                scanner, "Budget [" + project.getFormattedBudget() + "]: ", "Budget", project.getBudget());
+        int teamSize = ValidationUtils.readPositiveIntOrKeep(
+                scanner, "Team size [" + project.getTeamSize() + "]: ", "Team size", project.getTeamSize());
+        int duration = ValidationUtils.readPositiveIntOrKeep(
+                scanner, "Duration in weeks [" + project.getDurationWeeks() + "]: ", "Duration",
+                project.getDurationWeeks());
+
+        projectService.updateProject(project.getId(), name, description, budget, teamSize, duration);
+        System.out.println("\nProject " + project.getDisplayId() + " updated successfully.");
     }
 
     private void showProject(Project project) {

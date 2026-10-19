@@ -30,6 +30,27 @@ public class ProjectService {
         return false;
     }
 
+    // True when another project (not the one with this id) already uses the name.
+    public boolean nameTakenByOther(String name, int projectId) {
+        for (int i = 0; i < count; i++) {
+            if (projects[i].getId() != projectId
+                    && projects[i].getName().equalsIgnoreCase(name.trim())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean updateProject(int projectId, String name, String description, double budget,
+                                 int teamSize, int durationWeeks) {
+        Project project = findProject(projectId);
+        if (project == null || nameTakenByOther(name, projectId)) {
+            return false;
+        }
+        project.updateDetails(name.trim(), description, budget, teamSize, durationWeeks);
+        return true;
+    }
+
     public Project findProject(int projectId) {
         for (int i = 0; i < count; i++) {
             if (projects[i].getId() == projectId) {
