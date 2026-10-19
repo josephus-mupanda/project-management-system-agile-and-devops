@@ -116,6 +116,39 @@ class ProjectServiceTest {
     }
 
     @Test
+    void deleteProjectRemovesItFromTheCatalog() {
+        assertTrue(service.deleteProject(budgetBuddy.getId()));
+
+        assertEquals(1, service.getProjects().length);
+        assertNull(service.findProject(budgetBuddy.getId()));
+        assertSame(garden, service.getProjects()[0]);
+    }
+
+    @Test
+    void deleteUnknownProjectReturnsFalse() {
+        assertFalse(service.deleteProject(9999));
+        assertEquals(2, service.getProjects().length);
+    }
+
+    @Test
+    void deletedIdIsNotReused() {
+        int deletedId = budgetBuddy.getId();
+        service.deleteProject(deletedId);
+
+        Project next = new SoftwareProject("Next", "d", 100, 1, 1, "Java");
+        service.addProject(next);
+
+        assertTrue(next.getId() > deletedId);
+    }
+
+    @Test
+    void deletedNameCanBeUsedAgain() {
+        service.deleteProject(budgetBuddy.getId());
+
+        assertTrue(service.addProject(new SoftwareProject("Budget Buddy", "d", 100, 1, 1, "Java")));
+    }
+
+    @Test
     void returnedArrayIsACopy() {
         Project[] projects = service.getProjects();
         projects[0] = null;
