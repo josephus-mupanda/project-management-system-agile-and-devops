@@ -1,7 +1,5 @@
 package models;
 
-import java.util.Arrays;
-
 public abstract class Project {
 
     private static int nextId = 1;
@@ -12,8 +10,6 @@ public abstract class Project {
     private double budget;
     private int teamSize;
     private int durationWeeks;
-    private Task[] tasks;
-    private int taskCount;
 
     public Project(String name, String description, double budget, int teamSize, int durationWeeks) {
         if (name == null || name.trim().isEmpty()) {
@@ -34,7 +30,6 @@ public abstract class Project {
         this.budget = budget;
         this.teamSize = teamSize;
         this.durationWeeks = durationWeeks;
-        this.tasks = new Task[10];
     }
 
     public abstract String getType();
@@ -48,17 +43,12 @@ public abstract class Project {
     // Overload: the same row, with the description line optional.
     public void displayProject(boolean showDescription) {
         System.out.printf(
-                "%-6s | %-20s | %-10s | %-9d | %-9s | %s%n",
-                getDisplayId(), name, getType(), teamSize, "$" + getFormattedBudget(),
-                formatPercent(getCompletionPercentage())
+                "%-6s | %-20s | %-10s | %-9d | %-9s | %d weeks%n",
+                getDisplayId(), name, getType(), teamSize, "$" + getFormattedBudget(), durationWeeks
         );
         if (showDescription) {
             System.out.println("       | Description: " + description);
         }
-    }
-
-    public static String formatPercent(double value) {
-        return new java.text.DecimalFormat("0.##").format(value) + "%";
     }
 
     public String getFormattedBudget() {
@@ -95,51 +85,4 @@ public abstract class Project {
     public int getTeamSize() {
         return teamSize;
     }
-
-    public void addTask(Task task) {
-        if (taskCount == tasks.length) {
-            tasks = Arrays.copyOf(tasks, tasks.length * 2);
-        }
-        tasks[taskCount++] = task;
-    }
-
-    public boolean removeTask(int taskId) {
-        for (int i = 0; i < taskCount; i++) {
-            if (tasks[i].getId() == taskId) {
-                for (int j = i; j < taskCount - 1; j++) {
-                    tasks[j] = tasks[j + 1];
-                }
-                tasks[--taskCount] = null;
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public Task[] getTasks() {
-        return Arrays.copyOf(tasks, taskCount);
-    }
-
-    public int getTaskCount() {
-        return taskCount;
-    }
-
-    public int countByStatus(Task.Status status) {
-        int count = 0;
-        for (int i = 0; i < taskCount; i++) {
-            if (tasks[i].getStatus() == status) {
-                count++;
-            }
-        }
-        return count;
-    }
-
-    public double getCompletionPercentage() {
-        if (taskCount == 0) {
-            return 0.0;
-        }
-        double percentage = (double) countByStatus(Task.Status.COMPLETED) / taskCount * 100;
-        return Math.round(percentage * 100.0) / 100.0;
-    }
-
 }

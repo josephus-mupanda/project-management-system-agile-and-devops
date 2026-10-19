@@ -5,11 +5,8 @@ import models.HardwareProject;
 import models.Project;
 import models.RegularUser;
 import models.SoftwareProject;
-import models.Task;
 import models.User;
 import services.ProjectService;
-import services.ReportService;
-import services.TaskService;
 
 import java.util.Arrays;
 import java.util.Scanner;
@@ -22,23 +19,13 @@ public class ConsoleMenu {
 
     private final Scanner scanner;
     private final ProjectService projectService;
-    private final TaskService taskService;
-    private final ReportService reportService;
     private User[] users;
     private int userCount;
     private User currentUser;
 
-    public ConsoleMenu(
-            Scanner scanner,
-            ProjectService projectService,
-            TaskService taskService,
-            ReportService reportService,
-            User[] initialUsers
-    ) {
+    public ConsoleMenu(Scanner scanner, ProjectService projectService, User[] initialUsers) {
         this.scanner = scanner;
         this.projectService = projectService;
-        this.taskService = taskService;
-        this.reportService = reportService;
         this.users = Arrays.copyOf(initialUsers, Math.max(10, initialUsers.length * 2));
         this.userCount = initialUsers.length;
         this.currentUser = initialUsers[0];
@@ -68,35 +55,27 @@ public class ConsoleMenu {
                     projectMenu();
                     break;
                 case 2:
-                    taskMenu();
-                    break;
-                case 3:
-                    reportService.displayProjectReport();
-                    break;
-                case 4:
                     switchUserMenu();
                     break;
-                case 5:
+                case 3:
                     System.out.println("\nGoodbye.");
                     break;
                 default:
-                    System.out.println("Error: Invalid option. Please select 1-5.");
+                    System.out.println("Error: Invalid option. Please select 1-3.");
             }
-        } while (choice != 5);
+        } while (choice != 3);
     }
 
     private void displayMainMenu() {
-        printHeader("JAVA PROJECT MANAGEMENT SYSTEM");
+        printHeader("PROJECT HUB");
         System.out.println("Current User: " + currentUser.getName()
                 + " (" + currentUser.getRole() + ")");
         System.out.println();
         System.out.println("Main Menu:");
         System.out.println("-----------");
         System.out.println("1. Manage Projects");
-        System.out.println("2. Manage Tasks");
-        System.out.println("3. View Status Reports");
-        System.out.println("4. Switch User");
-        System.out.println("5. Exit");
+        System.out.println("2. Switch User");
+        System.out.println("3. Exit");
         System.out.println();
     }
 
@@ -212,7 +191,7 @@ public class ConsoleMenu {
             return;
         }
 
-        projectDetails(project);
+        showProject(project);
     }
 
     private void addProject() {
@@ -256,40 +235,6 @@ public class ConsoleMenu {
         System.out.println("\nProject successfully created (ID: " + project.getDisplayId() + ").");
     }
 
-    private void projectDetails(Project project) {
-
-        int choice;
-
-        do {
-            showProject(project);
-
-            System.out.println("\nOptions:");
-            System.out.println("1. Add New Task");
-            System.out.println("2. Update Task Status");
-            System.out.println("3. Remove Task");
-            System.out.println("4. Back to Main Menu");
-            System.out.println();
-
-            choice = ValidationUtils.readInt(scanner, "Enter your choice: ");
-
-            switch (choice) {
-                case 1:
-                    addTask(project);
-                    break;
-                case 2:
-                    updateTaskStatus(project);
-                    break;
-                case 3:
-                    removeTask(project);
-                    break;
-                case 4:
-                    break;
-                default:
-                    System.out.println("Error: Invalid option. Please select 1-4.");
-            }
-        } while (choice != 4);
-    }
-
     private void showProject(Project project) {
 
         printHeader("PROJECT DETAILS: " + project.getDisplayId());
@@ -297,193 +242,10 @@ public class ConsoleMenu {
         System.out.println("Project Name: " + project.getName());
         System.out.println("Type: " + project.getType());
         System.out.println(project.getProjectDetails());
+        System.out.println("Description: " + project.getDescription());
         System.out.println("Team Size: " + project.getTeamSize());
         System.out.println("Duration: " + project.getDurationWeeks() + " weeks");
         System.out.println("Budget: $" + project.getFormattedBudget());
-        System.out.println("\nAssociated Tasks:");
-        taskService.displayTasks(project);
-        System.out.println("Completion Rate: " + Project.formatPercent(project.getCompletionPercentage()));
-    }
-
-    // Tasks
-
-    private void taskMenu() {
-
-        int choice;
-
-        do {
-            printHeader("MANAGE TASKS");
-            System.out.println("1. Add New Task");
-            System.out.println("2. View Tasks by Project");
-            System.out.println("3. Update Task Status");
-            System.out.println("4. Remove Task");
-            System.out.println("5. Calculate Project Completion");
-            System.out.println("6. Back to Main Menu");
-            System.out.println();
-
-            choice = ValidationUtils.readInt(scanner, "Enter your choice: ");
-
-            switch (choice) {
-                case 1:
-                    addTask(null);
-                    break;
-                case 2:
-                    viewTasks();
-                    break;
-                case 3:
-                    updateTaskStatus(null);
-                    break;
-                case 4:
-                    removeTask(null);
-                    break;
-                case 5:
-                    calculateCompletion();
-                    break;
-                case 6:
-                    break;
-                default:
-                    System.out.println("Error: Invalid option. Please select 1-6.");
-            }
-        } while (choice != 6);
-    }
-
-    private void calculateCompletion() {
-
-        projectService.displayProjects(projectService.getProjects());
-
-        Project project = askForProject("Enter project ID: ");
-        if (project == null) {
-            return;
-        }
-
-        System.out.println("\nProject: " + project.getName());
-        System.out.println("Total tasks: " + project.getTaskCount());
-        System.out.println("Completed tasks: " + project.countByStatus(Task.Status.COMPLETED));
-        System.out.println("Pending tasks: " + project.countByStatus(Task.Status.PENDING));
-        System.out.println("In progress tasks: " + project.countByStatus(Task.Status.IN_PROGRESS));
-        System.out.printf("Completion: %.2f%%%n", project.getCompletionPercentage());
-    }
-
-    private void viewTasks() {
-
-        projectService.displayProjects(projectService.getProjects());
-
-        Project project = askForProject("Enter project ID: ");
-        if (project == null) {
-            return;
-        }
-
-        System.out.println("\nProject: " + project.getName());
-        taskService.displayTasks(project);
-        System.out.println("Completion Rate: " + Project.formatPercent(project.getCompletionPercentage()));
-    }
-
-    // A null scope means the project is asked for, as in the add task screen.
-    private void addTask(Project scope) {
-
-        printHeader("ADD NEW TASK");
-
-        String name = ValidationUtils.readText(scanner, "Enter task name: ", "Task name");
-
-        Project project = scope;
-        if (project == null) {
-            project = askForProject("Enter assigned project ID: ");
-            if (project == null) {
-                return;
-            }
-        }
-
-        Task.Status status = ValidationUtils.readStatus(
-                scanner, "Enter initial status (Pending/In Progress/Completed): "
-        );
-        int hours = ValidationUtils.readPositiveInt(scanner, "Enter estimated hours: ", "Hours");
-
-        User assignee = null;
-        System.out.println();
-        displayUsers();
-        int userId = ValidationUtils.readId(
-                scanner, "Enter assigned user ID (or 0 for nobody): ", "U"
-        );
-        while (userId != 0 && findUser(userId) == null) {
-            System.out.println("Error: User not found.\n");
-            userId = ValidationUtils.readId(scanner, "Enter again (or 0 for nobody): ", "U");
-        }
-        if (userId != 0) {
-            assignee = findUser(userId);
-        }
-
-        if (taskService.addTask(project, name, status, hours, assignee)) {
-            System.out.println("\nTask \"" + name + "\" added successfully to Project "
-                    + project.getDisplayId() + "!");
-        } else {
-            System.out.println("Error: A task with this name already exists in the project.");
-        }
-    }
-
-    private void updateTaskStatus(Project scope) {
-
-        if (!requireModifyAccess("update tasks")) {
-            return;
-        }
-
-        int taskId = ValidationUtils.readId(scanner, "Enter task ID: ", "TSK");
-        Project owner = ownerOf(scope, taskId);
-
-        if (owner == null) {
-            System.out.println("Error: Task not found.");
-            return;
-        }
-
-        Task task = taskService.findTask(owner, taskId);
-        Task.Status status = ValidationUtils.readStatus(scanner, "Enter new status: ");
-        task.setStatus(status);
-        System.out.println("\nTask \"" + task.getName() + "\" marked as " + status + ".");
-    }
-
-    private void removeTask(Project scope) {
-
-        if (!requireModifyAccess("delete tasks")) {
-            return;
-        }
-
-        int taskId = ValidationUtils.readId(scanner, "Enter task ID: ", "TSK");
-        Project owner = ownerOf(scope, taskId);
-
-        if (owner == null) {
-            System.out.println("Error: Task not found.");
-            return;
-        }
-
-        Task task = taskService.findTask(owner, taskId);
-        taskService.removeTask(owner, taskId);
-        System.out.println("\nTask \"" + task.getName() + "\" removed from Project "
-                + owner.getDisplayId() + ".");
-    }
-
-    private Project askForProject(String message) {
-
-        int id = ValidationUtils.readId(scanner, message, "PRJ");
-        Project project = projectService.findProject(id);
-
-        if (project == null) {
-            System.out.println("Error: Project not found.");
-        }
-        return project;
-    }
-
-    // Returns the project holding the task, looking only in the scope when one is given.
-    private Project ownerOf(Project scope, int taskId) {
-
-        if (scope != null) {
-            return taskService.findTask(scope, taskId) != null ? scope : null;
-        }
-
-        for (Project project : projectService.getProjects()) {
-            if (taskService.findTask(project, taskId) != null) {
-                return project;
-            }
-        }
-        return null;
     }
 
     // Users

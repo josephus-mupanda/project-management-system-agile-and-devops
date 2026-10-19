@@ -91,7 +91,7 @@ public class ProjectService {
             System.out.println(ConsoleMenu.LINE);
             System.out.printf(
                     "%-6s | %-20s | %-10s | %-9s | %-9s | %s%n",
-                    "ID", "PROJECT NAME", "TYPE", "TEAM SIZE", "BUDGET", "DONE"
+                    "ID", "PROJECT NAME", "TYPE", "TEAM SIZE", "BUDGET", "DURATION"
             );
             System.out.println(ConsoleMenu.LINE);
 

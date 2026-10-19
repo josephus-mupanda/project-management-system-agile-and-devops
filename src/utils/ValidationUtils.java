@@ -1,7 +1,5 @@
 package utils;
 
-import models.Task;
-
 import java.util.Scanner;
 
 public class ValidationUtils {
@@ -153,22 +151,4 @@ public class ValidationUtils {
         }
     }
 
-    public static Task.Status readStatus(Scanner scanner, String message) {
-
-        String prompt = message;
-
-        while (true) {
-
-            System.out.print(prompt);
-            Task.Status status = Task.Status.fromText(scanner.nextLine());
-
-            if (status != null) {
-                return status;
-            }
-            System.out.println(
-                    "Error: Invalid status. Please choose from [Pending, In Progress, Completed].\n"
-            );
-            prompt = RETRY;
-        }
-    }
 }
