@@ -68,6 +68,36 @@ class UserServiceTest {
     }
 
     @Test
+    void deleteUserRemovesIt() {
+        User regular = service.createUser("Reg", "reg@test.com", false);
+
+        assertTrue(service.deleteUser(regular.getId(), admin));
+
+        assertNull(service.findUser(regular.getId()));
+        assertEquals(1, service.getUsers().length);
+    }
+
+    @Test
+    void cannotDeleteTheLoggedInUser() {
+        assertFalse(service.deleteUser(admin.getId(), admin));
+        assertSame(admin, service.findUser(admin.getId()));
+    }
+
+    @Test
+    void deleteUnknownUserReturnsFalse() {
+        assertFalse(service.deleteUser(9999, admin));
+        assertEquals(1, service.getUsers().length);
+    }
+
+    @Test
+    void deletedEmailCanBeUsedAgain() {
+        User regular = service.createUser("Reg", "reg@test.com", false);
+        service.deleteUser(regular.getId(), admin);
+
+        assertNotNull(service.createUser("Reg again", "reg@test.com", false));
+    }
+
+    @Test
     void returnedArrayIsACopy() {
         User[] users = service.getUsers();
         users[0] = null;

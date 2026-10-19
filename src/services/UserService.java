@@ -48,6 +48,23 @@ public class UserService {
         return null;
     }
 
+    // Refuses to delete the logged in user, so there is always someone using the app.
+    public boolean deleteUser(int userId, User currentUser) {
+        if (currentUser.getId() == userId) {
+            return false;
+        }
+        for (int i = 0; i < count; i++) {
+            if (users[i].getId() == userId) {
+                for (int j = i; j < count - 1; j++) {
+                    users[j] = users[j + 1];
+                }
+                users[--count] = null;
+                return true;
+            }
+        }
+        return false;
+    }
+
     public User[] getUsers() {
         return Arrays.copyOf(users, count);
     }

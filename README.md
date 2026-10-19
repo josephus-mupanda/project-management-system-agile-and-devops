@@ -55,7 +55,7 @@ flowchart TD
 ```mermaid
 flowchart TD
     M(["Main Menu"]) --> P["1. Manage Projects"]
-    M --> U["2. Switch User"]
+    M --> U["2. Manage Users"]
     M --> X(["3. Exit"])
 
     P --> P1["Browse Project Catalog"]
@@ -65,6 +65,7 @@ flowchart TD
 
     U --> U1["Switch to another user"]
     U --> U2["Create a new user - admin only"]
+    U --> U3["Delete a user - admin only"]
 ```
 
 IDs are shown with a prefix: `PRJ001` for projects and `U001` for users. When the program asks for an ID you can type `PRJ001` or just `1`.
@@ -75,7 +76,8 @@ IDs are shown with a prefix: `PRJ001` for projects and `U001` for users. When th
 |---|---|---|
 | Browse and search projects | yes | yes |
 | Add projects | yes | yes |
-| Create users | no | yes |
+| Update and delete projects | no | yes |
+| Create and delete users | no | yes |
 
 ## Project structure
 

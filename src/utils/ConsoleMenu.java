@@ -51,7 +51,7 @@ public class ConsoleMenu {
                     projectMenu();
                     break;
                 case 2:
-                    switchUserMenu();
+                    userMenu();
                     break;
                 case 3:
                     System.out.println("\nGoodbye.");
@@ -70,7 +70,7 @@ public class ConsoleMenu {
         System.out.println("Main Menu:");
         System.out.println("-----------");
         System.out.println("1. Manage Projects");
-        System.out.println("2. Switch User");
+        System.out.println("2. Manage Users");
         System.out.println("3. Exit");
         System.out.println();
     }
@@ -335,19 +335,20 @@ public class ConsoleMenu {
 
     // Users
 
-    private void switchUserMenu() {
+    private void userMenu() {
 
         int choice;
 
         do {
-            printHeader("SWITCH USER");
+            printHeader("MANAGE USERS");
             System.out.println("Current User: " + currentUser.getName()
                     + " (" + currentUser.getRole() + ")");
             System.out.println();
             userService.displayUsers();
             System.out.println("1. Switch to another user");
             System.out.println("2. Create a new user");
-            System.out.println("3. Back to Main Menu");
+            System.out.println("3. Delete a user");
+            System.out.println("4. Back to Main Menu");
             System.out.println();
 
             choice = ValidationUtils.readInt(scanner, "Enter your choice: ");
@@ -360,11 +361,46 @@ public class ConsoleMenu {
                     createUser();
                     break;
                 case 3:
+                    deleteUser();
+                    break;
+                case 4:
                     break;
                 default:
-                    System.out.println("Error: Invalid option. Please select 1-3.");
+                    System.out.println("Error: Invalid option. Please select 1-4.");
             }
-        } while (choice != 3);
+        } while (choice != 4);
+    }
+
+    private void deleteUser() {
+
+        if (!requireModifyAccess("delete users")) {
+            return;
+        }
+
+        int id = ValidationUtils.readId(scanner, "Enter user ID to delete: ", "U");
+
+        if (id == currentUser.getId()) {
+            System.out.println("Error: You cannot delete the user you are logged in as.");
+            return;
+        }
+
+        User user = userService.findUser(id);
+
+        if (user == null) {
+            System.out.println("Error: User not found.");
+            return;
+        }
+
+        boolean confirmed = ValidationUtils.readYesNo(
+                scanner, "Delete user \"" + user.getName() + "\"? (y/n): ");
+
+        if (!confirmed) {
+            System.out.println("Nothing was deleted.");
+            return;
+        }
+
+        userService.deleteUser(id, currentUser);
+        System.out.println("\nUser \"" + user.getName() + "\" deleted.");
     }
 
     private void switchUser() {
