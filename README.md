@@ -142,5 +142,12 @@ docs/
 
 ## More documentation
 
-- [Sprint 0 planning](docs/agile/sprint-0-planning.md): vision, backlog, acceptance criteria, Definition of Done.
-- [Design decisions](docs/design-decisions.md): why the classes are shaped this way.
+| Document | Content |
+|---|---|
+| [Sprint 0 – Planning](docs/agile/sprint-0-planning.md) | Vision, backlog, estimates, acceptance criteria, Definition of Done, Sprint 1 plan |
+| [Sprint 1 – Review](docs/agile/sprint-1-review.md) | Delivered stories, acceptance checks, test and CI evidence |
+| [Sprint 1 – Retrospective](docs/agile/sprint-1-retrospective.md) | What went well, what did not, 5 improvements |
+| [Sprint 2 – Plan](docs/agile/sprint-2-plan.md) | Selected stories and how the improvements are applied |
+| [Sprint 2 – Review](docs/agile/sprint-2-review.md) | Delivered stories, monitoring, test and CI evidence |
+| [Sprint 2 – Retrospective](docs/agile/sprint-2-retrospective.md) | Results of the improvements, lessons learned |
+| [Design decisions](docs/design-decisions.md) | Why the classes are shaped this way |

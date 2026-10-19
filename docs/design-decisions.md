@@ -13,7 +13,8 @@ This page explains why the code is built the way it is.
 7. [IDs](#ids)
 8. [Layers: menu, services, models](#layers-menu-services-models)
 9. [Role rules](#role-rules)
-10. [Known limits and next steps](#known-limits-and-next-steps)
+10. [Monitoring: logging, error tracking and health](#monitoring-logging-error-tracking-and-health)
+11. [Known limits and next steps](#known-limits-and-next-steps)
 
 ## Class diagram
 
@@ -127,6 +128,13 @@ Users used to be stored inside `ConsoleMenu`, which made them impossible to unit
 ## Role rules
 
 Regular users can view and add projects. Only admins can create users. The check is in one small method, `requireModifyAccess`, so the rule is easy to find and change.
+
+## Monitoring: logging, error tracking and health
+
+- **`AppLogger`** wraps Java's built-in `java.util.logging`, so no library is needed. It writes to `logs/app.log` and not to the console, because log lines in the middle of a menu would make it hard to read.
+- **Error tracking** sits in one place: the `try/catch` around the main menu loop. Any unexpected error inside any screen ends there, is logged with its stack trace and counted, and the user goes back to the main menu.
+- **`HealthService`** is the console version of a health endpoint. The status is `DEGRADED` as soon as one unexpected error happened, so a problem stays visible even if the user did not notice the message.
+- Actions are logged in `ConsoleMenu` and not in the services, because only the menu knows who is logged in, and logging in the services would also log the sample data loaded at start.
 
 ## Known limits and next steps
 
