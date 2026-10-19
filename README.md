@@ -60,7 +60,7 @@ flowchart TD
 
     P --> P1["Browse Project Catalog"]
     P --> P2["Add New Project"]
-    P1 --> F["Filter: all, software, hardware, budget range"]
+    P1 --> F["Filter: all, software, hardware, budget range, name"]
     F --> D["Enter a project ID to see its details"]
 
     U --> U1["Switch to another user"]

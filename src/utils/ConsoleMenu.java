@@ -122,6 +122,7 @@ public class ConsoleMenu {
             System.out.println("2. Software Projects Only");
             System.out.println("3. Hardware Projects Only");
             System.out.println("4. Search by Budget Range");
+            System.out.println("5. Search by Name");
             System.out.println("0. Back");
             System.out.println();
 
@@ -143,8 +144,13 @@ public class ConsoleMenu {
                 case 4:
                     list = searchByBudget();
                     break;
+                case 5:
+                    String text = ValidationUtils.readText(
+                            scanner, "Enter part of the project name: ", "Search text");
+                    list = projectService.searchByName(text);
+                    break;
                 default:
-                    System.out.println("Error: Invalid option. Please select 0-4.");
+                    System.out.println("Error: Invalid option. Please select 0-5.");
                     continue;
             }
 

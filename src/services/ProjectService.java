@@ -103,6 +103,20 @@ public class ProjectService {
         return Arrays.copyOf(result, found);
     }
 
+    // Partial match that ignores upper and lower case: "garden" finds "Smart Garden Monitor".
+    public Project[] searchByName(String text) {
+        String search = text.trim().toLowerCase();
+        Project[] result = new Project[count];
+        int found = 0;
+
+        for (int i = 0; i < count; i++) {
+            if (projects[i].getName().toLowerCase().contains(search)) {
+                result[found++] = projects[i];
+            }
+        }
+        return Arrays.copyOf(result, found);
+    }
+
     public void displayProjects(Project[] list) {
         if (list.length == 0) {
             System.out.println("No projects found.");

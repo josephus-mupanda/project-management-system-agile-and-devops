@@ -149,6 +149,26 @@ class ProjectServiceTest {
     }
 
     @Test
+    void searchByNameFindsPartialMatchIgnoringCase() {
+        Project[] result = service.searchByName("GARDEN");
+
+        assertEquals(1, result.length);
+        assertSame(garden, result[0]);
+    }
+
+    @Test
+    void searchByNameReturnsEveryMatch() {
+        service.addProject(new SoftwareProject("Garden Planner", "d", 100, 1, 1, "Java"));
+
+        assertEquals(2, service.searchByName(" garden ").length);
+    }
+
+    @Test
+    void searchByNameWithNoMatchReturnsEmptyArray() {
+        assertEquals(0, service.searchByName("rocket").length);
+    }
+
+    @Test
     void returnedArrayIsACopy() {
         Project[] projects = service.getProjects();
         projects[0] = null;
