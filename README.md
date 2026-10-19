@@ -1,5 +1,7 @@
 # Project Hub
 
+[![CI](https://github.com/josephus-mupanda/project-management-system-agile-and-devops/actions/workflows/ci.yml/badge.svg)](https://github.com/josephus-mupanda/project-management-system-agile-and-devops/actions/workflows/ci.yml)
+
 A small console application written in Java 21 to manage a catalog of software and hardware projects and the users who work on them. Only admins can change data.
 
 This project is my individual assessment for **Agile & DevOps in Practice**. The starting code was a bigger task management system. Its scope was reduced to **users and projects only**, so the focus stays on the Agile and DevOps practices. The planning documents are in [docs/agile](docs/agile).
@@ -20,6 +22,23 @@ java -Dstdout.encoding=UTF-8 -cp out Main
 ```
 
 When the program starts you are logged in as **Admin**. **Josephus Mupanda (Regular)** also exists, and five sample projects are loaded.
+
+## How to run the tests
+
+```
+mvn verify
+```
+
+In IntelliJ, right-click `pom.xml` and choose "Add as Maven Project", then run `verify` from the Maven panel. Tests are in the `test` folder.
+
+## Continuous integration
+
+Every push to GitHub runs the [CI workflow](.github/workflows/ci.yml):
+
+1. Check out the code and set up JDK 21.
+2. `mvn -B verify`: compile and run all unit tests. The build fails if one test fails.
+3. Smoke test: start the app and choose "Exit", to prove it starts.
+4. Upload the test reports as a build artifact.
 
 ## How the program is organised
 
