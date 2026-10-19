@@ -61,6 +61,30 @@ class ProjectTest {
     }
 
     @Test
+    void updateDetailsChangesAllValues() {
+        Project project = new SoftwareProject("Old", "Old text", 100, 1, 1, "Java");
+
+        project.updateDetails("New", "New text", 250, 4, 6);
+
+        assertEquals("New", project.getName());
+        assertEquals("New text", project.getDescription());
+        assertEquals(250, project.getBudget());
+        assertEquals(4, project.getTeamSize());
+        assertEquals(6, project.getDurationWeeks());
+    }
+
+    @Test
+    void invalidUpdateChangesNothing() {
+        Project project = new SoftwareProject("Keep", "Text", 100, 1, 1, "Java");
+
+        assertThrows(IllegalArgumentException.class,
+                () -> project.updateDetails("Changed", "Text", 0, 1, 1));
+
+        assertEquals("Keep", project.getName());
+        assertEquals(100, project.getBudget());
+    }
+
+    @Test
     void onlyAdminsCanModify() {
         assertTrue(new AdminUser("Admin", "admin@test.com").canModify());
         assertFalse(new RegularUser("Reg", "reg@test.com").canModify());

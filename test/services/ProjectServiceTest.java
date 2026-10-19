@@ -11,6 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class ProjectServiceTest {
 
@@ -75,6 +76,43 @@ class ProjectServiceTest {
     @Test
     void budgetRangeWithNoMatchReturnsEmptyArray() {
         assertEquals(0, service.getByBudgetRange(1, 10).length);
+    }
+
+    @Test
+    void updateProjectChangesItsDetails() {
+        boolean updated = service.updateProject(
+                budgetBuddy.getId(), "  Budget Buddy Pro ", "New text", 9000, 4, 10);
+
+        assertTrue(updated);
+        assertEquals("Budget Buddy Pro", budgetBuddy.getName());
+        assertEquals(9000, budgetBuddy.getBudget());
+        assertEquals(4, budgetBuddy.getTeamSize());
+        assertEquals(10, budgetBuddy.getDurationWeeks());
+    }
+
+    @Test
+    void updateProjectCanKeepItsOwnName() {
+        assertTrue(service.updateProject(budgetBuddy.getId(), "BUDGET BUDDY", "d", 100, 1, 1));
+    }
+
+    @Test
+    void updateProjectRefusesNameOfAnotherProject() {
+        boolean updated = service.updateProject(
+                budgetBuddy.getId(), "smart garden", "d", 100, 1, 1);
+
+        assertFalse(updated);
+        assertEquals("Budget Buddy", budgetBuddy.getName());
+    }
+
+    @Test
+    void updateUnknownProjectReturnsFalse() {
+        assertFalse(service.updateProject(9999, "Name", "d", 100, 1, 1));
+    }
+
+    @Test
+    void nameTakenByOtherIgnoresTheProjectItself() {
+        assertFalse(service.nameTakenByOther("Budget Buddy", budgetBuddy.getId()));
+        assertTrue(service.nameTakenByOther("Budget Buddy", garden.getId()));
     }
 
     @Test
